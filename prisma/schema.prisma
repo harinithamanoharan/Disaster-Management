@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id                String             @id @default(cuid())
+  name              String?
+  email             String?            @unique
+  password          String?
+  role              String             @default("VICTIM") // VICTIM, VOLUNTEER, ADMIN, RESCUE
+  emergencyContacts EmergencyContact[]
+  requests          HelpRequest[]
+  offers            ResourceOffer[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+}
+
+model EmergencyContact {
+  id          String   @id @default(cuid())
+  name        String
+  phoneNumber String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model HelpRequest {
+  id                  String   @id @default(cuid())
+  requesterId         String?
+  requester           User?    @relation(fields: [requesterId], references: [id])
+  lat                 Float
+  lng                 Float
+  locationName        String?
+  type                String   // FOOD, SHELTER, MEDICINE, RESCUE, SOS
+  description         String?
+  urgency             String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  status              String   @default("PENDING") // PENDING, ASSIGNED, IN_PROGRESS, COMPLETED
+  peopleAffected      Int      @default(1)
+  priorityScore       Float    @default(0)
+  imageUrl            String?
+  aiVerificationStatus String   @default("NEEDS_VERIFICATION") // VERIFIED, NEEDS_VERIFICATION, FLAGGED
+  aiTags              String?  // JSON string of tags like ["Flood", "Blocked"]
+  smsSource           Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model ResourceOffer {
+  id            String   @id @default(cuid())
+  volunteerId   String?
+  volunteer     User?    @relation(fields: [volunteerId], references: [id])
+  type          String   // FOOD, SHELTER, MEDICINE, TRANSPORT
+  quantity      String?
+  lat           Float
+  lng           Float
+  locationName  String?
+  availability  Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+model EmergencyAlert {
+  id        String   @id @default(cuid())
+  lat       Float
+  lng       Float
+  status    String   @default("ACTIVE") // ACTIVE, RESOLVED
+  createdAt DateTime @default(now())
+}
+
+model Volunteer {
+  id           String   @id @default(cuid())
+  name         String
+  email        String
+  phone        String
+  location     String
+  role         String
+  availability String
+  createdAt    DateTime @default(now())
+}
