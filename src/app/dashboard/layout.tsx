@@ -1,3 +1,5 @@
+"use client";
+
 import { useSession, SessionProvider } from "next-auth/react";
 import Sidebar from "@/components/Sidebar";
 import { redirect } from "next/navigation";
